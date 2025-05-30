@@ -3,6 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Classe;
+use App\Models\User;
+use App\Models\Presence;
 
 class Student extends Model
 {

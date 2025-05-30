@@ -9,26 +9,20 @@ use Illuminate\Http\Request;
 
 class ClassTeacherController extends Controller
 {
-    /**
-     * Lister toutes les associations classe-enseignant (admin uniquement).
-     */
-    public function index(Request $request)
+    public function listClassTeacher(Request $request)
     {
         if ($request->user()->role !== 'admin') {
-            return response()->json(['error' => 'Unauthorized: Admin only'], 403);
+            return response()->json(['error' => 'Non autorisé : Administrateur uniquement'], 403);
         }
 
-        $associations = ClassTeacher::with(['classe', 'enseignant'])->get();
-        return response()->json($associations ?: ['message' => 'No class-teacher associations found']);
+        $associations = ClassTeacher::with(['classe', 'teacher'])->get();
+        return response()->json($associations ?: ['message' => 'Aucune association classe-enseignant trouvée']);
     }
 
-    /**
-     * Créer une nouvelle association classe-enseignant (admin uniquement).
-     */
-    public function store(Request $request)
+    public function NewClassTeacher(Request $request)
     {
         if ($request->user()->role !== 'admin') {
-            return response()->json(['error' => 'Unauthorized: Admin only'], 403);
+            return response()->json(['error' => 'Non autorisé : Administrateur uniquement'], 403);
         }
 
         $request->validate([
@@ -38,15 +32,14 @@ class ClassTeacherController extends Controller
 
         $teacher = User::findOrFail($request->teacher_id);
         if ($teacher->role !== 'enseignant') {
-            return response()->json(['error' => 'User must have teacher role'], 422);
+            return response()->json(['error' => 'L\'utilisateur doit avoir le rôle enseignant'], 422);
         }
 
-        // Vérifier si l'association existe déjà
         if (ClassTeacher::where('class_id', $request->class_id)
             ->where('teacher_id', $request->teacher_id)
             ->exists()
         ) {
-            return response()->json(['error' => 'This teacher is already assigned to this class'], 422);
+            return response()->json(['error' => 'Cet enseignant est déjà assigné à cette classe'], 422);
         }
 
         $association = ClassTeacher::create([
@@ -54,28 +47,22 @@ class ClassTeacherController extends Controller
             'teacher_id' => $request->teacher_id,
         ]);
 
-        return response()->json($association->load(['classe', 'enseignant']), 201);
+        return response()->json($association->load(['classe', 'teacher']), 201);
     }
 
-    /**
-     * Afficher une association spécifique (admin uniquement).
-     */
-    public function show(Request $request, ClassTeacher $classTeacher)
+    public function specialClassTeacher(Request $request, ClassTeacher $classTeacher)
     {
         if ($request->user()->role !== 'admin') {
-            return response()->json(['error' => 'Unauthorized: Admin only'], 403);
+            return response()->json(['error' => 'Non autorisé : Administrateur uniquement'], 403);
         }
 
-        return response()->json($classTeacher->load(['classe', 'enseignant']));
+        return response()->json($classTeacher->load(['classe', 'teacher']));
     }
 
-    /**
-     * Supprimer une association classe-enseignant (admin uniquement).
-     */
-    public function destroy(Request $request, ClassTeacher $classTeacher)
+    public function supprimerClassTeacher(Request $request, ClassTeacher $classTeacher)
     {
         if ($request->user()->role !== 'admin') {
-            return response()->json(['error' => 'Unauthorized: Admin only'], 403);
+            return response()->json(['error' => 'Non autorisé : Administrateur uniquement'], 403);
         }
 
         $classTeacher->delete();

@@ -9,65 +9,25 @@ use Illuminate\Http\Request;
 class StudentController extends Controller
 {
     /**
-     * Afficher la liste des étudiants (admin uniquement).
+     * Lister tous les étudiants (admin uniquement).
      */
-    public function index(Request $request)
+    public function listStudent(Request $request)
     {
         if ($request->user()->role !== 'admin') {
-            return response()->json(['error' => 'Unauthorized: Admin only'], 403);
+            return response()->json(['error' => 'Non autorisé : Administrateur uniquement'], 403);
         }
 
         $students = Student::with(['classe', 'user'])->get();
-        return response()->json($students ?: ['message' => 'No students found']);
-    }
-
-    /**
-     * Créer un nouvel étudiant (admin uniquement).
-     */
-    public function store(Request $request)
-    {
-        if ($request->user()->role !== 'admin') {
-            return response()->json(['error' => 'Unauthorized: Admin only'], 403);
-        }
-
-        $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'class_id' => 'required|exists:classes,id',
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-        ]);
-
-        $user = User::findOrFail($request->user_id);
-        if ($user->role !== 'etudiant') {
-            return response()->json(['error' => 'User must have student role'], 422);
-        }
-
-        if ($user->student) {
-            return response()->json(['error' => 'User is already enrolled as a student'], 422);
-        }
-
-        $lastStudent = Student::orderBy('id', 'desc')->first();
-        $nextNumber = $lastStudent ? (int) str_replace('IUT-', '', $lastStudent->matricule) + 1 : 1;
-        $matricule = 'IUT-' . str_pad($nextNumber, 6, '0', STR_PAD_LEFT);
-
-        $student = Student::create([
-            'user_id' => $request->user_id,
-            'class_id' => $request->class_id,
-            'first_name' => $request->first_name,
-            'last_name' => $request->last_name,
-            'matricule' => $matricule,
-        ]);
-
-        return response()->json($student->load(['classe', 'user']), 201);
+        return response()->json($students ?: ['message' => 'Aucun étudiant trouvé']);
     }
 
     /**
      * Afficher un étudiant spécifique (admin uniquement).
      */
-    public function show(Request $request, Student $student)
+    public function showStudent(Request $request, Student $student)
     {
         if ($request->user()->role !== 'admin') {
-            return response()->json(['error' => 'Unauthorized: Admin only'], 403);
+            return response()->json(['error' => 'Non autorisé : Administrateur uniquement'], 403);
         }
 
         return $student->load(['classe', 'user']);
@@ -76,26 +36,26 @@ class StudentController extends Controller
     /**
      * Mettre à jour un étudiant (admin uniquement).
      */
-    public function update(Request $request, Student $student)
+    public function updateStudent(Request $request, Student $student)
     {
         if ($request->user()->role !== 'admin') {
-            return response()->json(['error' => 'Unauthorized: Admin only'], 403);
+            return response()->json(['error' => 'Non autorisé : Administrateur uniquement'], 403);
         }
 
         $request->validate([
             'user_id' => 'required|exists:users,id',
-            'class_id' => 'required|exists:classes,id',
+            'class_id' => 'nullable|exists:classes,id',
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
         ]);
 
         $user = User::findOrFail($request->user_id);
-        if ($user->role !== 'student') {
-            return response()->json(['error' => 'User must have student role'], 422);
+        if ($user->role !== 'etudiant') {
+            return response()->json(['error' => 'L\'utilisateur doit avoir le rôle étudiant'], 422);
         }
 
         if ($user->student && $user->student->id !== $student->id) {
-            return response()->json(['error' => 'This user is already linked to another student record'], 422);
+            return response()->json(['error' => 'Cet utilisateur est déjà lié à un autre profil étudiant'], 422);
         }
 
         $student->update([
@@ -111,10 +71,10 @@ class StudentController extends Controller
     /**
      * Supprimer un étudiant (admin uniquement).
      */
-    public function destroy(Request $request, Student $student)
+    public function supprimerStudent(Request $request, Student $student)
     {
         if ($request->user()->role !== 'admin') {
-            return response()->json(['error' => 'Unauthorized: Admin only'], 403);
+            return response()->json(['error' => 'Non autorisé : Administrateur uniquement'], 403);
         }
 
         $student->delete();
@@ -122,12 +82,12 @@ class StudentController extends Controller
     }
 
     /**
-     * Réaffecter un étudiant à une classe (admin uniquement).
+     * Assigner une classe à un étudiant (admin uniquement).
      */
     public function assignClass(Request $request, Student $student)
     {
         if ($request->user()->role !== 'admin') {
-            return response()->json(['error' => 'Unauthorized: Admin only'], 403);
+            return response()->json(['error' => 'Non autorisé : Administrateur uniquement'], 403);
         }
 
         $request->validate([
@@ -142,23 +102,23 @@ class StudentController extends Controller
     }
 
     /**
-     * Enrôlement d'un étudiant par lui-même.
+     * Inscription d'un étudiant par lui-même.
      */
     public function enroll(Request $request)
     {
         $user = $request->user();
-        if ($user->role !== 'student') {
-            return response()->json(['error' => 'Unauthorized: Student only'], 403);
+        if ($user->role !== 'etudiant') {
+            return response()->json(['error' => 'Non autorisé : Étudiant uniquement'], 403);
         }
 
         if ($user->student) {
-            return response()->json(['error' => 'You are already enrolled'], 422);
+            return response()->json(['error' => 'Vous êtes déjà inscrit'], 422);
         }
 
         $request->validate([
-            'class_id' => 'required|exists:classes,id',
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
+            'class_id' => 'nullable|exists:classes,id', // Optionnel
         ]);
 
         $lastStudent = Student::orderBy('id', 'desc')->first();
@@ -167,7 +127,7 @@ class StudentController extends Controller
 
         $student = Student::create([
             'user_id' => $user->id,
-            'class_id' => $request->class_id,
+            'class_id' => $request->class_id, // Peut être null
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
             'matricule' => $matricule,
