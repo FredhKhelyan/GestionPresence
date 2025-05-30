@@ -50,5 +50,5 @@
 
         // Routes pour les enseignants
         Route::post('/store', [PresenceController::class, 'store']);
-        Route::get('/teacher-classes', [PresenceController::class, 'teacherClasses']);
+        Route::get('/teacherClasses', [PresenceController::class, 'teacherClasses']);
     });

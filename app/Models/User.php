@@ -16,12 +16,17 @@ class User extends Authenticatable
     /**
      * Relation avec le modèle Student (un utilisateur peut être un étudiant).
      */
+    // public function student()
+    // {
+    //     return $this->hasOne(Student::class);
+    // }
+
     public function student()
     {
-        return $this->hasOne(Student::class);
+        return $this->hasOne(Student::class, 'user_id');
     }
 
-    public function classe()
+    public function classes()
     {
         return $this->belongsToMany(Classe::class, 'class_teacher', 'teacher_id', 'class_id');
     }

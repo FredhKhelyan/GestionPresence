@@ -14,11 +14,10 @@ class Student extends Model
     /**
      * Un étudiant appartient à une classe.
      */
-    public function class()
+    public function classe()
     {
-        return $this->belongsTo(Classe::class);
+        return $this->belongsTo(Classe::class, 'class_id');
     }
-
     /**
      * Un étudiant est lié à un utilisateur.
      */
