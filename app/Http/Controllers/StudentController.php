@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreStudentRequest;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -104,7 +105,7 @@ class StudentController extends Controller
     /**
      * Inscription d'un étudiant par lui-même.
      */
-    public function enroll(Request $request)
+    public function enroll(StoreStudentRequest $request)
     {
         $user = $request->user();
         if ($user->role !== 'etudiant') {
@@ -120,6 +121,8 @@ class StudentController extends Controller
             'last_name' => 'required|string|max:255',
             'class_id' => 'nullable|exists:classes,id', // Optionnel
         ]);
+
+        // $request->validated();
 
         $lastStudent = Student::orderBy('id', 'desc')->first();
         $nextNumber = $lastStudent ? (int) str_replace('IUT-', '', $lastStudent->matricule) + 1 : 1;

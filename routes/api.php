@@ -30,6 +30,15 @@
         Route::delete('/supprimerStudent/{student}', [StudentController::class, 'supprimerStudent']);
         Route::put('/students/{student}/assignClass', [StudentController::class, 'assignClass']);
 
+        // Route::controller('App\Http\Controllers\StudentController')->group(function () {
+        //     Route::get('/students', 'listStudent');
+        //     Route::post('/students', 'store');
+        //     Route::get('/students/{student}', 'showStudent');
+        //     Route::put('/students/{student}', 'updateStudent');
+        //     Route::delete('/students/{student}', 'supprimerStudent');
+        //     Route::put('/students/{student}/assignClass', 'assignClass');
+        // })->middleware('auth:sanctum');
+
         // Routes vers la gestion des présences (Enseignant et Admin)
         Route::get('/index', [PresenceController::class, 'index']);
         Route::get('/show/{presence}', [PresenceController::class, 'show']);
