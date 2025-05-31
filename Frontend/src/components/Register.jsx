@@ -2,23 +2,27 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import { toast } from 'react-toastify';
-import { UserIcon, LockClosedIcon } from '@heroicons/react/24/outline';
+import { UserIcon, EnvelopeIcon, LockClosedIcon, IdentificationIcon } from '@heroicons/react/24/outline';
 
-const Login = () => {
+const Register = () => {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setRole] = useState('etudiant');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await api.post('/api/login', {
+      const response = await api.post('/api/register', {
+        name,
         email,
         password,
+        role,
       });
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('role', response.data.user.role);
-      toast.success('Connexion réussie !', {
+      toast.success('Inscription réussie !', {
         position: 'top-right',
         autoClose: 3000,
         hideProgressBar: false,
@@ -31,9 +35,7 @@ const Login = () => {
       });
       navigate('/dashboard');
     } catch (error) {
-
-        // Erreur gérée par l'intercepteur axios qui se trouve dans api/axios.js
-
+      // Erreur gérée par l'intercepteur axios
     }
   };
 
@@ -52,11 +54,11 @@ const Login = () => {
         </defs>
         <rect width="100%" height="100%" fill="url(#academic-pattern)" />
       </svg>
-      {/* Effet gradiant */}
+      {/* Effet gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/80 to-neutral/50"></div>
 
       <div
-        className="card w-full max-w-lg bg-white/90 backdrop-blur-md shadow-xl rounded-2xl  transform hover:scale-105 hover:shadow-2xl transition-all duration-500 relative z-10"
+        className="card w-full max-w-lg bg-white/90 backdrop-blur-md shadow-xl rounded-2xl transform hover:scale-105 hover:shadow-2xl transition-all duration-500 relative z-10"
         data-aos="fade-up"
       >
         {/* Header */}
@@ -65,7 +67,7 @@ const Login = () => {
             Université Connect
           </h1>
           <p className="text-sm font-opensans text-primary/70 mt-1 text-white">
-          Gestion de présence numérique
+            Gestion de présence numérique
           </p>
         </div>
         {/* Body */}
@@ -73,10 +75,26 @@ const Login = () => {
           <form onSubmit={handleSubmit}>
             <div className="form-control mb-6" data-aos="fade-up" data-aos-delay="100">
               <label className="label">
+                <span className="label-text font-opensans text-primary/90 text-xl">Nom complet</span>
+              </label>
+              <div className="relative group">
+                <IdentificationIcon className="absolute w-6 h-6 text-primary/60 left-4 top-1/2 transform -translate-y-1/2 group-focus-within:text-secondary group-focus-within:animate-icon-bounce" />
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="input w-full pl-14 pr-4 py-4 font-opensans bg-white/50 border-2 border-primary/20 rounded-lg focus:border-secondary focus:ring-4 focus:ring-secondary/30 transition-all duration-300 placeholder-primary/40 text-primary/90 text-lg"
+                  placeholder="Dexter Nkamta"
+                  required
+                />
+              </div>
+            </div>
+            <div className="form-control mb-6" data-aos="fade-up" data-aos-delay="200">
+              <label className="label">
                 <span className="label-text font-opensans text-primary/90 text-xl">Email</span>
               </label>
               <div className="relative group">
-                <UserIcon className="absolute w-6 h-6 text-primary/60 left-4 top-1/2 transform -translate-y-1/2 group-focus-within:text-secondary group-focus-within:animate-icon-bounce" />
+                <EnvelopeIcon className="absolute w-6 h-6 text-primary/60 left-4 top-1/2 transform -translate-y-1/2 group-focus-within:text-secondary group-focus-within:animate-icon-bounce" />
                 <input
                   type="email"
                   value={email}
@@ -87,7 +105,7 @@ const Login = () => {
                 />
               </div>
             </div>
-            <div className="form-control mb-10" data-aos="fade-up" data-aos-delay="200">
+            <div className="form-control mb-6" data-aos="fade-up" data-aos-delay="300">
               <label className="label">
                 <span className="label-text font-opensans text-primary/90 text-xl">Mot de passe</span>
               </label>
@@ -103,19 +121,36 @@ const Login = () => {
                 />
               </div>
             </div>
-            <div className="form-control" data-aos="fade-up" data-aos-delay="300">
+            <div className="form-control mb-10" data-aos="fade-up" data-aos-delay="400">
+              <label className="label">
+                <span className="label-text font-opensans text-primary/90 text-xl">Rôle</span>
+              </label>
+              <div className="relative group">
+                <UserIcon className="absolute w-6 h-6 text-primary/60 left-4 top-1/2 transform -translate-y-1/2 group-focus-within:text-secondary group-focus-within:animate-icon-bounce" />
+                <select
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  className="select w-full pl-14 pr-4 py-4 font-opensans bg-white/50 border-2 border-primary/20 rounded-lg focus:border-secondary focus:ring-4 focus:ring-secondary/30 transition-all duration-300 text-primary/90 text-lg"
+                >
+                  <option value="etudiant">Étudiant</option>
+                  <option value="enseignant">Enseignant</option>
+                  <option value="admin">Administrateur</option>
+                </select>
+              </div>
+            </div>
+            <div className="form-control" data-aos="fade-up" data-aos-delay="500">
               <button
                 type="submit"
                 className="btn w-full bg-secondary text-white font-montserrat font-semibold text-xl py-4 rounded-lg shadow-2xl hover:bg-secondary/90 hover:scale-110 transform transition-all duration-300 relative overflow-hidden shine bg-blue-950"
               >
-                Se connecter
+                S'inscrire
               </button>
             </div>
           </form>
           <p className="text-center mt-8 font-opensans text-primary/70 text-sm">
-            Pas de compte ?{' '}
-            <a href="/register" className="text-secondary font-semibold hover:underline transition-colors duration-300">
-              S'inscrire
+            Déjà inscrit ?{' '}
+            <a href="/login" className="text-secondary font-semibold hover:underline transition-colors duration-300">
+              Se connecter
             </a>
           </p>
         </div>
@@ -124,6 +159,4 @@ const Login = () => {
   );
 };
 
-export default Login;
-
-
+export default Register;
