@@ -34,4 +34,15 @@ class Classe extends Model
             ->where('role', 'enseignant');
     }
 
+    public function presences()
+    {
+        return $this->hasManyThrough(
+            Presence::class,
+            Student::class,
+            'class_id', // Clé étrangère dans students
+            'student_id', // Clé étrangère dans presences
+            'id', // Clé primaire dans classes
+            'id' // Clé primaire dans students
+        );
+    }
 }

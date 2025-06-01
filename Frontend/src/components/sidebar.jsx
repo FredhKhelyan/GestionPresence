@@ -13,8 +13,9 @@ const Sidebar = ({ setActiveSection }) => {
     { name: 'Utilisateurs', section: 'users', icon: UserGroupIcon },
     { name: 'Classes', section: 'classes', icon: BookOpenIcon },
     { name: 'Cours', section: 'courses', icon: AcademicCapIcon },
-    { name: 'Présences', section: 'stats', icon: ChartBarIcon },
     { name: 'Etudiants', section: 'students', icon: AcademicCapIcon },
+    { name: 'Présences', section: 'attendances', icon: ClipboardDocumentListIcon },
+    // { name: 'Paramètres', section: 'settings', icon: CogIcon }, Cette ligne est commentée car non utilisée
   ];
 
   const teacherLinks = [

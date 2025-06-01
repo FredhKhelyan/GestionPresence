@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 class PresenceController extends Controller
 {
 
+    // Affiche toutes les présences (admin uniquement).
     public function index(Request $request)
     {
         if ($request->user()->role !== 'admin') {
@@ -17,6 +18,29 @@ class PresenceController extends Controller
         }
 
         return Presence::with(['student', 'student.user', 'student.classe'])->get();
+    }
+
+    // Cette fonction filter permet de lister les présences d'une classe spécifique
+    public function StudentPresence(Request $request)
+    {
+        if ($request->user()->role !== 'admin') {
+            return response()->json(['error' => 'Non autorisé : Administrateur uniquement'], 403);
+        }
+
+        $query = Presence::with(['student', 'student.user', 'student.classe']);
+
+        if ($request->query('class_id')) {
+            $query->whereHas('student', function ($q) use ($request) {
+                $q->where('class_id', $request->query('class_id'));
+            });
+        }
+
+        if ($request->query('date')) {
+            $query->where('date', $request->query('date'));
+        }
+
+        $presences = $query->latest()->get();
+        return response()->json($presences ?: ['message' => 'Aucune présence trouvée']);
     }
     /**
      * Enregistrer une présence (enseignant pour sa classe ou admin).
@@ -32,31 +56,39 @@ class PresenceController extends Controller
 
         $student = Student::findOrFail($request->student_id);
 
-        // Vérifier si l'étudiant est assigné à une classe
         if (!$student->class_id) {
             return response()->json(['error' => 'L\'étudiant n\'est pas assigné à une classe'], 422);
         }
 
         $classe = $student->classe;
 
-        // Vérifier les autorisations
         if ($user->role !== 'admin') {
             if ($user->role !== 'enseignant' || !$classe->teachers()->where('users.id', $user->id)->exists()) {
                 return response()->json(['error' => 'Non autorisé : Vous devez être admin ou enseignant assigné à cette classe'], 403);
             }
         }
 
-        // Vérifier si une présence existe déjà
         if (Presence::where('student_id', $request->student_id)->where('date', $request->date)->exists()) {
             return response()->json(['error' => 'Présence déjà enregistrée pour cet étudiant à cette date'], 422);
         }
 
-        // Créer la présence
         $presence = Presence::create([
             'student_id' => $request->student_id,
             'date' => $request->date,
             'status' => $request->status,
         ]);
+
+        // Créer notification pour admin
+        if ($user->role !== 'admin') {
+            $admins = \App\Models\User::where('role', 'admin')->get();
+            foreach ($admins as $admin) {
+                \App\Models\Notification::create([
+                    'user_id' => $admin->id,
+                    'message' => "Nouvelle présence enregistrée pour {$student->first_name} {$student->last_name} ({$classe->name}, {$request->date}).",
+                    'read' => false,
+                ]);
+            }
+        }
 
         return response()->json($presence->load(['student', 'student.user', 'student.classe']), 201);
     }

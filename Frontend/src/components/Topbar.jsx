@@ -11,6 +11,7 @@ const Topbar = () => {
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [loadingNotifications, setLoadingNotifications] = useState(true);
 
   useEffect(() => {
     // Récupérer utilisateur
@@ -26,7 +27,8 @@ const Topbar = () => {
     // Récupérer notifications
     const fetchNotifications = async () => {
       try {
-        const response = await api.get('/api/notifications');
+        setLoadingNotifications(true);
+        const response = await api.get('/api/AllNotifications');
         setNotifications(Array.isArray(response.data) ? response.data : []);
       } catch (error) {
         console.error('Fetch notifications error:', error);
@@ -34,8 +36,10 @@ const Topbar = () => {
           position: 'top-right',
           autoClose: 3000,
           style: { backgroundColor: '#E74C3C', color: '#FFFFFF' },
-          className: 'toast-success',
         });
+        setNotifications([]);
+      } finally {
+        setLoadingNotifications(false);
       }
     };
 
@@ -55,14 +59,13 @@ const Topbar = () => {
       position: 'top-right',
       autoClose: 3000,
       style: { backgroundColor: '#27AE60', color: '#FFFFFF' },
-      className: 'toast-success',
     });
     navigate('/login');
   };
 
   const handleMarkAsRead = async (id) => {
     try {
-      await api.post(`/api/notifications/${id}/read`);
+      await api.post(`/api/markAsRead/${id}/read`);
       setNotifications(notifications.map((notif) =>
         notif.id === id ? { ...notif, read: true } : notif
       ));
@@ -70,7 +73,6 @@ const Topbar = () => {
         position: 'top-right',
         autoClose: 3000,
         style: { backgroundColor: '#27AE60', color: '#FFFFFF' },
-        className: 'toast-success',
       });
     } catch (error) {
       console.error('Mark as read error:', error);
@@ -78,7 +80,6 @@ const Topbar = () => {
         position: 'top-right',
         autoClose: 3000,
         style: { backgroundColor: '#E74C3C', color: '#FFFFFF' },
-        className: 'toast-success',
       });
     }
   };
@@ -163,6 +164,7 @@ const Topbar = () => {
             <button
               onClick={() => setShowNotifications(!showNotifications)}
               className="relative flex items-center space-x-2 text-primary/60 hover:text-secondary hover:bg-blue-950/10 rounded-lg px-3 py-2 transition-all duration-300 shine"
+              disabled={loadingNotifications}
             >
               <BellIcon className="w-6 h-6" />
               {unreadCount > 0 && (
@@ -178,7 +180,11 @@ const Topbar = () => {
                   transition={{ duration: 0.2 }}
                   className="notification-dropdown"
                 >
-                  {notifications.length === 0 ? (
+                  {loadingNotifications ? (
+                    <div className="notification-item text-center font-opensans text-primary/70">
+                      Chargement...
+                    </div>
+                  ) : notifications.length === 0 ? (
                     <div className="notification-item text-center font-opensans text-primary/70">
                       Aucune notification
                     </div>

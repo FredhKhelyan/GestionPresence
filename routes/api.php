@@ -5,6 +5,8 @@
     use App\Http\Controllers\StudentController;
     use App\Http\Controllers\PresenceController;
     use App\Http\Controllers\ClassTeacherController;
+    use App\Http\Controllers\NotificationController;
+    use App\Http\Controllers\StatsController;
     use Illuminate\Support\Facades\Route;
 
     // routes publiques vers la connexion et l'inscription des utilisateurs du systeme
@@ -44,10 +46,12 @@
 
         // Routes vers la gestion des présences (Enseignant et Admin)
         Route::get('/index', [PresenceController::class, 'index']);
+        Route::post('/store', [PresenceController::class, 'store']);
         Route::get('/show/{presence}', [PresenceController::class, 'show']);
         Route::put('/update/{presence}', [PresenceController::class, 'update']);
         Route::delete('/destroy/{presence}', [PresenceController::class, 'destroy']);
         Route::get('/presences/class/{class}', [PresenceController::class, 'classPresences']);
+        Route::get('/presences/StudentPresence', [PresenceController::class, 'StudentPresence']);
 
         // Routes vers la gestion des enseignants (Admin uniquement)
         Route::get('/listClassTeacher', [ClassTeacherController::class, 'listClassTeacher']);
@@ -61,6 +65,12 @@
 
 
         // Routes pour les enseignants
-        Route::post('/store', [PresenceController::class, 'store']);
         Route::get('/teacherClasses', [PresenceController::class, 'teacherClasses']);
+
+        // Routes pour les notifications
+        Route::get('/AllNotifications', [NotificationController::class, 'AllNotifications']);
+        Route::put('/markAsRead/{id}/read', [NotificationController::class, 'markAsRead']);
+
+        // Routes pour les statistiques (Admin uniquement)
+        Route::get('/stats', [StatsController::class, 'stats']);
     });

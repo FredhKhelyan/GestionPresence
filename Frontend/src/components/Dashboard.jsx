@@ -8,6 +8,7 @@ import ClassesManager from './ClassesManager';
 import UsersManager from './UsersManager';
 import ClassTeacherManager from './ClassTeacherManager';
 import StudentManager from './StudentManager';
+import PresenceManager from './PresenceManager';
 import TeacherDashboard from './TeacherDashboard';
 import StudentDashboard from './StudentDashboard';
 import ErrorBoundary from './ErrorBoundary';
@@ -53,7 +54,12 @@ const Dashboard = () => {
                 <StudentManager />
               </ErrorBoundary>
             );
-          case 'stats':
+          case 'attendances':
+            return (
+              <ErrorBoundary>
+                <PresenceManager />
+              </ErrorBoundary>
+            );
           case 'settings':
             return <div className="text-2xl font-montserrat text-primary">Section en développement</div>;
           default:
