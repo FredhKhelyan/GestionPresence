@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { HomeIcon, UserGroupIcon, CalendarIcon, ChartBarIcon, CogIcon, ClipboardDocumentListIcon, AcademicCapIcon, BookOpenIcon, ArrowLeftOnRectangleIcon } from '@heroicons/react/24/outline';
+import { HomeIcon, UserGroupIcon, ClipboardDocumentListIcon, AcademicCapIcon, BookOpenIcon, ArrowLeftOnRectangleIcon } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 
@@ -9,27 +9,25 @@ const Sidebar = ({ setActiveSection }) => {
   const role = localStorage.getItem('role');
 
   const adminLinks = [
-    { name: 'Dashboard', section: 'dashboard', icon: HomeIcon },
+    { name: 'Tableau de Bord', section: 'dashboard', icon: HomeIcon },
     { name: 'Utilisateurs', section: 'users', icon: UserGroupIcon },
     { name: 'Classes', section: 'classes', icon: BookOpenIcon },
     { name: 'Cours', section: 'courses', icon: AcademicCapIcon },
-    { name: 'Etudiants', section: 'students', icon: AcademicCapIcon },
+    { name: 'Étudiants', section: 'students', icon: AcademicCapIcon },
     { name: 'Présences', section: 'attendances', icon: ClipboardDocumentListIcon },
-    // { name: 'Paramètres', section: 'settings', icon: CogIcon }, Cette ligne est commentée car non utilisée
   ];
 
   const teacherLinks = [
-    { name: 'Dashboard', section: 'dashboard', icon: HomeIcon },
+    { name: 'Tableau de Bord', section: 'dashboard', icon: HomeIcon },
     { name: 'Présences', section: 'attendances', icon: ClipboardDocumentListIcon },
-    { name: 'Cours', section: 'courses', icon: AcademicCapIcon },
-    { name: 'Évaluations', section: 'grades', icon: ChartBarIcon },
+    { name: 'Mes Classes', section: 'courses', icon: AcademicCapIcon },
   ];
 
   const studentLinks = [
-    { name: 'Dashboard', section: 'dashboard', icon: HomeIcon },
+    { name: 'Tableau de Bord', section: 'dashboard', icon: HomeIcon },
     { name: 'Présences', section: 'attendances', icon: ClipboardDocumentListIcon },
-    { name: 'Cours', section: 'courses', icon: AcademicCapIcon },
-    { name: 'Notes', section: 'grades', icon: ChartBarIcon },
+    // { name: 'Cours', section: 'courses', icon: AcademicCapIcon },
+    // { name: 'Notes', section: 'grades', icon: AcademicCapIcon },
   ];
 
   const links = role === 'admin' ? adminLinks : role === 'enseignant' ? teacherLinks : studentLinks;
@@ -66,9 +64,9 @@ const Sidebar = ({ setActiveSection }) => {
             border-right: 4px solid #27AE60;
           }
           .sidebar-icon {
-            width: 28px;
-            height: 28px;
-            margin-right: 16px;
+            width: 24px;
+            height: 24px;
+            margin-right: 12px;
             transition: transform 0.3s ease;
           }
           .sidebar-link:hover .sidebar-icon {
@@ -98,16 +96,17 @@ const Sidebar = ({ setActiveSection }) => {
         <div className="p-6 border-b border-primary/30">
           <h2 className="text-3xl font-montserrat font-bold text-center text-white">IUT Management</h2>
         </div>
-        <nav className="mt-6 space-y-2 flex-1">
+        <nav className="mt-6 space-y-1 flex-1">
           {links.map((link) => (
             <motion.button
               key={link.section}
               onClick={() => handleLinkClick(link.section)}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className={`sidebar-link flex items-center px-8 py-4 text-xl font-opensans text-white/90 w-full text-left ${
+              className={`sidebar-link flex items-center px-6 py-3 text-lg font-opensans text-white/90 w-full text-left ${
                 activeLink === link.section ? 'sidebar-link-active' : ''
               }`}
+              aria-label={`Naviguer vers ${link.name}`}
             >
               <link.icon
                 className={`sidebar-icon ${
@@ -123,7 +122,8 @@ const Sidebar = ({ setActiveSection }) => {
             onClick={handleLogout}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="sidebar-link flex items-center px-8 py-4 text-xl font-opensans text-white/90 w-full text-left hover:bg-alert/20"
+            className="sidebar-link flex items-center px-6 py-3 text-lg font-opensans text-white/90 w-full text-left hover:bg-alert/20"
+            aria-label="Se déconnecter"
           >
             <ArrowLeftOnRectangleIcon className="sidebar-icon" />
             <span className="font-opensans font-medium">Déconnexion</span>

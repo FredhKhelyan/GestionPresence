@@ -106,33 +106,64 @@ class StudentController extends Controller
      */
     public function enroll(Request $request)
     {
-        $user = $request->user();
-        if ($user->role !== 'etudiant') {
-            return response()->json(['error' => 'Non autorisé : Étudiant uniquement'], 403);
+        try {
+            $user = $request->user();
+            if ($user->role !== 'etudiant') {
+                return response()->json(['error' => 'Non autorisé : Étudiant uniquement'], 403);
+            }
+
+            if ($user->student) {
+                return response()->json(['error' => 'Vous êtes déjà inscrit'], 422);
+            }
+
+            $request->validate([
+                'first_name' => 'required|string|max:255',
+                'last_name' => 'required|string|max:255',
+                'class_id' => 'nullable|exists:classes,id',
+            ]);
+
+            $lastStudent = Student::orderBy('id', 'desc')->first();
+            $nextNumber = $lastStudent ? (int) str_replace('IUT-', '', $lastStudent->matricule) + 1 : 1;
+            $matricule = 'IUT-' . str_pad($nextNumber, 6, '0', STR_PAD_LEFT);
+
+            $student = Student::create([
+                'user_id' => $user->id,
+                'class_id' => $request->class_id,
+                'first_name' => $request->first_name,
+                'last_name' => $request->last_name,
+                'matricule' => $matricule,
+            ]);
+
+            return response()->json($student->load(['classe', 'user']), 201);
+        } catch (QueryException $e) {
+            \Log::error('StudentController QueryException: ' . $e->getMessage());
+            return response()->json(['error' => 'Erreur de base de données'], 500);
+        } catch (\Exception $e) {
+            \Log::error('StudentController Exception: ' . $e->getMessage());
+            return response()->json(['error' => 'Erreur serveur: ' . $e->getMessage()], 500);
         }
+    }
 
-        if ($user->student) {
-            return response()->json(['error' => 'Vous êtes déjà inscrit'], 422);
+    public function MonProfil(Request $request)
+    {
+        try {
+            $user = $request->user();
+            if ($user->role !== 'etudiant') {
+                return response()->json(['error' => 'Non autorisé : Étudiant uniquement'], 403);
+            }
+
+            $student = $user->student;
+            if (!$student) {
+                return response()->json(['error' => 'Non inscrit'], 404);
+            }
+
+            return response()->json($student->load(['classe', 'user']));
+        } catch (QueryException $e) {
+            \Log::error('StudentController QueryException: ' . $e->getMessage());
+            return response()->json(['error' => 'Erreur de base de données'], 500);
+        } catch (\Exception $e) {
+            \Log::error('StudentController Exception: ' . $e->getMessage());
+            return response()->json(['error' => 'Erreur serveur: ' . $e->getMessage()], 500);
         }
-
-        $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'class_id' => 'nullable|exists:classes,id', // Optionnel
-        ]);
-
-        $lastStudent = Student::orderBy('id', 'desc')->first();
-        $nextNumber = $lastStudent ? (int) str_replace('IUT-', '', $lastStudent->matricule) + 1 : 1;
-        $matricule = 'IUT-' . str_pad($nextNumber, 6, '0', STR_PAD_LEFT);
-
-        $student = Student::create([
-            'user_id' => $user->id,
-            'class_id' => $request->class_id, // Peut être null
-            'first_name' => $request->first_name,
-            'last_name' => $request->last_name,
-            'matricule' => $matricule,
-        ]);
-
-        return response()->json($student->load(['classe', 'user']), 201);
     }
 }

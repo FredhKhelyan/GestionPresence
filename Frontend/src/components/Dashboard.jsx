@@ -11,6 +11,7 @@ import StudentManager from './StudentManager';
 import PresenceManager from './PresenceManager';
 import TeacherDashboard from './TeacherDashboard';
 import StudentDashboard from './StudentDashboard';
+import StudentAttendances from './StudentAttendances';
 import ErrorBoundary from './ErrorBoundary';
 
 const Dashboard = () => {
@@ -81,6 +82,11 @@ const Dashboard = () => {
           case 'dashboard':
             return <StudentDashboard />;
           case 'attendances':
+            return (
+              <ErrorBoundary>
+                <StudentAttendances />
+              </ErrorBoundary>
+            );
           case 'courses':
           case 'grades':
             return <div className="text-2xl font-montserrat text-primary">Section en développement</div>;
