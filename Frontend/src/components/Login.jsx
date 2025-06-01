@@ -62,7 +62,7 @@ const Login = () => {
         {/* Header */}
         <div className="bg-primary/10 rounded-t-2xl p-6 text-center border-b border-secondary/20 bg-blue-950">
           <h1 className="text-4xl font-montserrat font-bold text-primary text-white">
-            Université Connect
+            IUT Management
           </h1>
           <p className="text-sm font-opensans text-primary/70 mt-1 text-white">
           Gestion de présence numérique

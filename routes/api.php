@@ -14,6 +14,9 @@
     // Routes protégées par le middleware d'authentification vers les differents controllers
     Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
+        Route::get('/user', [AuthController::class, 'user']);
+        Route::get('/teacher', [AuthController::class, 'teacher']);
+        Route::get('/actor', [AuthController::class, 'actor']);
 
         // Routes vers la gestion des classes(Admin uniquement)
         Route::get('/listClasse', [ClasseController::class, 'listClasse']);

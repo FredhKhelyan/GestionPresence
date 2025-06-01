@@ -29,6 +29,7 @@ import Register from './components/Register';
 import Dashboard from './components/Dashboard';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+// import ClassesManager from './components/ClassesManager';
 
 function App() {
   return (
@@ -38,7 +39,8 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/dashboard/*" element={<Dashboard />} />
+                  <Route path="/dashboard/*" element={<Dashboard />} />
+                  {/* <Route path="/dashboard/classes" element={<ClassesManager />} /> */}
           <Route path="/" element={<Login />} />
         </Routes>
       </div>
