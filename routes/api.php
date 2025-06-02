@@ -5,9 +5,9 @@
     use App\Http\Controllers\StudentController;
     use App\Http\Controllers\PresenceController;
     use App\Http\Controllers\ClassTeacherController;
+    use App\Http\Controllers\TeacherController;
     use App\Http\Controllers\NotificationController;
     use App\Http\Controllers\StatsController;
-    use App\Http\Controllers\TeacherStatsController;
     use Illuminate\Support\Facades\Route;
 
     // routes publiques vers la connexion et l'inscription des utilisateurs du systeme
@@ -68,7 +68,10 @@
 
         // Routes pour les enseignants
         Route::get('/teacherClasses', [PresenceController::class, 'teacherClasses']);
-        Route::get('/teacher/TeacherStats', [TeacherStatsController::class, 'TeacherStats']);
+        Route::get('/teacher/profile', [TeacherController::class, 'getProfile']);
+        Route::get('/teacher/classes', [TeacherController::class, 'getClasses']);
+        Route::get('/teacher/stats', [TeacherController::class, 'getStats']);
+
 
 
         // Routes pour les notifications

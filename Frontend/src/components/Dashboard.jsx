@@ -10,6 +10,8 @@ import ClassTeacherManager from './ClassTeacherManager';
 import StudentManager from './StudentManager';
 import PresenceManager from './PresenceManager';
 import TeacherDashboard from './TeacherDashboard';
+import TeacherAttendances from './TeacherAttendances';
+import TeacherClasses from './TeacherClasses';
 import StudentDashboard from './StudentDashboard';
 import StudentAttendances from './StudentAttendances';
 import ErrorBoundary from './ErrorBoundary';
@@ -71,7 +73,17 @@ const Dashboard = () => {
           case 'dashboard':
             return <TeacherDashboard />;
           case 'attendances':
+            return (
+              <ErrorBoundary>
+                <TeacherAttendances />
+              </ErrorBoundary>
+            );
           case 'courses':
+            return (
+              <ErrorBoundary>
+                <TeacherClasses />
+              </ErrorBoundary>
+            );
           case 'grades':
             return <div className="text-2xl font-montserrat text-primary">Section en développement</div>;
           default:
@@ -134,3 +146,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+

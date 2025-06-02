@@ -11,22 +11,11 @@ class Classe extends Model
     /**
      * Une classe peut avoir plusieurs étudiants.
      */
-    // public function students()
-    // {
-    //     return $this->hasMany(Student::class);
-    // }
+ 
     public function students()
     {
         return $this->hasMany(Student::class, 'class_id');
     }
-    /**
-     * Un enseignant peut enseigner plusieurs classes.
-     */
-    // public function teachers()
-    // {
-    //     return $this->belongsToMany(User::class, 'class_teacher', 'class_id', 'teacher_id')
-    //         ->where('role', 'teacher');
-    // }
 
     public function teachers()
     {
