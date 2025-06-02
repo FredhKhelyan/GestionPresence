@@ -8,6 +8,7 @@
     use App\Http\Controllers\TeacherController;
     use App\Http\Controllers\NotificationController;
     use App\Http\Controllers\StatsController;
+    use App\Http\Controllers\ClassesController;
     use Illuminate\Support\Facades\Route;
 
     // routes publiques vers la connexion et l'inscription des utilisateurs du systeme
@@ -71,11 +72,12 @@
         Route::get('/teacher/profile', [TeacherController::class, 'getProfile']);
         Route::get('/teacher/classes', [TeacherController::class, 'getClasses']);
         Route::get('/teacher/stats', [TeacherController::class, 'getStats']);
+        Route::get('/classes/{id}/students', [ClassesController::class, 'getStudents']);
 
 
 
-        // Routes pour les notifications
-        Route::get('/AllNotifications', [NotificationController::class, 'AllNotifications']);
+    // Routes pour les notifications
+    Route::get('/AllNotifications', [NotificationController::class, 'AllNotifications']);
         Route::put('/markAsRead/{id}/read', [NotificationController::class, 'markAsRead']);
 
         // Routes pour les statistiques (Admin uniquement)

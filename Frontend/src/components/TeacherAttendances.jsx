@@ -19,7 +19,7 @@ const TeacherAttendances = () => {
 
     const fetchClasses = async () => {
       try {
-        const response = await api.get('/api/teacher/getClasses');
+        const response = await api.get('/api/teacher/classes');
         setClasses(response.data);
       } catch (error) {
         console.error('Fetch classes error:', error.response?.data);
